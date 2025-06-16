@@ -1,0 +1,14 @@
+{
+  "watch": ["backend/src"],
+  "ext": "ts,json",
+  "ignore": [
+    "backend/src/**/*.test.ts",
+    "backend/src/**/*.spec.ts",
+    "backend/dist"
+  ],
+  "exec": "ts-node --project backend/tsconfig.json backend/src/index.ts",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "delay": 1000
+}
