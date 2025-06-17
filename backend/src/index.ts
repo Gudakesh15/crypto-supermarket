@@ -76,11 +76,11 @@ app.post('/api/ai/chat', (req, res) => {
   res.json({ message: 'AI chat endpoint - coming soon!' });
 });
 
-// Wallet endpoints placeholder
-app.post('/api/wallet/analyze', (req, res) => {
-  // TODO: Implement wallet analysis
-  res.json({ message: 'Wallet analysis endpoint - coming soon!' });
-});
+// Import wallet routes
+import walletRoutes from './routes/wallet';
+
+// Use wallet routes
+app.use('/api/wallet', walletRoutes);
 
 // Market data endpoints placeholder
 app.get('/api/market/prices', (req, res) => {
