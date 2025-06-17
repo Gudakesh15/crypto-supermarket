@@ -5,10 +5,20 @@ import { CONTRACT_ADDRESSES, ERC20_ABI } from '../config/web3';
 import type { TokenBalance, SupportedToken } from '../types/wallet';
 
 export class WalletService {
-  private publicClient: any;
-
-  constructor() {
-    this.publicClient = getPublicClient(config);
+  /**
+   * Get public client instance
+   */
+  private async getPublicClient() {
+    try {
+      const client = getPublicClient(config);
+      if (!client) {
+        throw new Error('Public client not available');
+      }
+      return client;
+    } catch (error) {
+      console.error('Error getting public client:', error);
+      throw new Error('Failed to initialize blockchain client');
+    }
   }
 
   /**
@@ -16,11 +26,8 @@ export class WalletService {
    */
   async getETHBalance(address: string): Promise<string> {
     try {
-      if (!this.publicClient) {
-        throw new Error('Public client not initialized');
-      }
-
-      const balance = await this.publicClient.getBalance({ address });
+      const publicClient = await this.getPublicClient();
+      const balance = await publicClient.getBalance({ address: address as `0x${string}` });
       return formatUnits(balance, 18);
     } catch (error) {
       console.error('Error fetching ETH balance:', error);
@@ -37,18 +44,16 @@ export class WalletService {
     decimals: number = 18
   ): Promise<string> {
     try {
-      if (!this.publicClient) {
-        throw new Error('Public client not initialized');
-      }
-
-      const balance = await this.publicClient.readContract({
+      const publicClient = await this.getPublicClient();
+      
+      const balance = await publicClient.readContract({
         address: tokenAddress as `0x${string}`,
         abi: ERC20_ABI,
         functionName: 'balanceOf',
         args: [walletAddress as `0x${string}`],
       });
 
-      return formatUnits(balance, decimals);
+      return formatUnits(balance as bigint, decimals);
     } catch (error) {
       console.error(`Error fetching token balance for ${tokenAddress}:`, error);
       throw new Error(`Failed to fetch token balance for ${tokenAddress}`);

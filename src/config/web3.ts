@@ -65,9 +65,9 @@ export const walletConfig: WalletConnectionConfig = {
 
 // Contract addresses for mainnet
 export const CONTRACT_ADDRESSES = {
-  USDC: '0xA0b86a33E6417749fFdB2e1c3B2bc73ddA2E8d08',
-  USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-  WBTC: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599',
+  USDC: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', // USDC on Ethereum mainnet
+  USDT: '0xdAC17F958D2ee523a2206206994597C13D831ec7', // USDT on Ethereum mainnet (Tether)
+  WBTC: '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599', // WBTC on Ethereum mainnet
 } as const;
 
 // ERC-20 ABI for token balance reading

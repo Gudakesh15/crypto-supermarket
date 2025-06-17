@@ -91,13 +91,21 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     try {
       setWalletState(prev => ({ ...prev, error: null }));
       
-      // Get injected connector (MetaMask)
-      const injectedConnector = connectors.find(c => c.type === 'injected');
-      if (injectedConnector) {
-        await connect({ connector: injectedConnector });
+      // Import and use Web3Modal for wallet selection
+      const { initWeb3Modal } = await import('../config/web3');
+      const modal = initWeb3Modal();
+      
+      if (modal) {
+        console.log('Opening Web3Modal for wallet selection...');
+        // Open Web3Modal for wallet selection - it handles connection automatically
+        modal.open();
       } else {
-        // Fallback to first available connector
-        if (connectors.length > 0) {
+        console.warn('Web3Modal not available, using fallback connection');
+        // Fallback to direct wagmi connection if Web3Modal fails
+        const injectedConnector = connectors.find(c => c.type === 'injected');
+        if (injectedConnector) {
+          await connect({ connector: injectedConnector });
+        } else if (connectors.length > 0) {
           await connect({ connector: connectors[0] });
         } else {
           throw new Error('No wallet connectors available');
@@ -116,6 +124,19 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const disconnectWallet = useCallback(async () => {
     try {
       await disconnect();
+      
+      // Also close Web3Modal if it's open
+      try {
+        const { initWeb3Modal } = await import('../config/web3');
+        const modal = initWeb3Modal();
+        if (modal) {
+          modal.close();
+        }
+      } catch (error) {
+        // Ignore Web3Modal errors during disconnect
+        console.warn('Failed to close Web3Modal:', error);
+      }
+      
       setWalletState(initialWalletState);
       setTokenBalances([]);
     } catch (error: any) {
